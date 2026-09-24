@@ -20,17 +20,21 @@ jobs:
         shell: pwsh
         run: |
           $inputs = Get-ChildItem -Path . -Recurse -Filter input.json -ErrorAction SilentlyContinue
-          $compiler = Get-ChildItem -Path "$env:USERPROFILE\.nuget\packages" -Recurse -Filter XamlCompiler.exe -ErrorAction SilentlyContinue | Select-Object -First 1
-          if ($inputs.Count -eq 0 -or $null -eq $compiler) {
-            Write-Error "WinUI compiler input or executable was not found."
+          if ($inputs.Count -eq 0) {
+            Write-Error "WinUI compiler input.json was not produced."
           }
           foreach ($input in $inputs) {
-            Write-Host "===== XAML compiler diagnostics for $($input.FullName) ====="
+            Write-Host "===== XAML compiler input: $($input.FullName) ====="
             Get-Content -Raw $input.FullName
-            $diagnostic = Join-Path $input.DirectoryName "diagnostic.json"
-            & $compiler.FullName $input.FullName $diagnostic 2>&1
-            if (Test-Path $diagnostic) {
-              Get-Content -Raw $diagnostic
-            }
           }
-          exit 1
+      - name: Upload WinUI compiler diagnostics
+        if: steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: winui-compiler-diagnostics
+          path: |
+            obj/**
+            bin/**
+          if-no-files-found: error
+      - run: exit 1
+        if: steps.build.outcome == 'failure'
