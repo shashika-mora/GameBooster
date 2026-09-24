@@ -17,8 +17,8 @@
             <muxc:NavigationViewItem Content="Dashboard" Tag="Dashboard"><muxc:NavigationViewItem.Icon><SymbolIcon Symbol="Home"/></muxc:NavigationViewItem.Icon></muxc:NavigationViewItem>
             <muxc:NavigationViewItem Content="Games" Tag="Games"><muxc:NavigationViewItem.Icon><SymbolIcon Symbol="Library"/></muxc:NavigationViewItem.Icon></muxc:NavigationViewItem>
             <muxc:NavigationViewItem Content="Profiles" Tag="Profiles"><muxc:NavigationViewItem.Icon><SymbolIcon Symbol="Edit"/></muxc:NavigationViewItem.Icon></muxc:NavigationViewItem>
-            <muxc:NavigationViewItem Content="Sessions" Tag="Sessions"><muxc:NavigationViewItem.Icon><SymbolIcon Symbol="History"/></muxc:NavigationViewItem.Icon></muxc:NavigationViewItem>
-            <muxc:NavigationViewItem Content="System Monitor" Tag="Monitor"><muxc:NavigationViewItem.Icon><SymbolIcon Symbol="SpeedHigh"/></muxc:NavigationViewItem.Icon></muxc:NavigationViewItem>
+            <muxc:NavigationViewItem Content="Sessions" Tag="Sessions"><muxc:NavigationViewItem.Icon><SymbolIcon Symbol="Clock"/></muxc:NavigationViewItem.Icon></muxc:NavigationViewItem>
+            <muxc:NavigationViewItem Content="System Monitor" Tag="Monitor"><muxc:NavigationViewItem.Icon><SymbolIcon Symbol="View"/></muxc:NavigationViewItem.Icon></muxc:NavigationViewItem>
           </muxc:NavigationView.MenuItems>
         </muxc:NavigationView>
         <StackPanel Grid.Row="2" Spacing="6"><TextBlock Text="●  Offline by design" Foreground="#6EE7B7" FontSize="12"/><TextBlock Text="Native Windows build · v1.0" Foreground="#7F8A9D" FontSize="11"/></StackPanel>
