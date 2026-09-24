@@ -26,6 +26,7 @@ jobs:
           }
           foreach ($input in $inputs) {
             Write-Host "===== XAML compiler diagnostics for $($input.FullName) ====="
+            Get-Content -Raw $input.FullName
             $diagnostic = Join-Path $input.DirectoryName "diagnostic.json"
             & $compiler.FullName $input.FullName $diagnostic 2>&1
             if (Test-Path $diagnostic) {
