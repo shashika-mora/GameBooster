@@ -2,7 +2,8 @@
 
 ## 0.1.0 — development
 
-- Added the Tauri 2 desktop shell, React interface, and local SQLite game library.
+- Replaced the browser-backed prototype with a native WinUI 3 / C# Windows desktop application.
+- Added native local SQLite persistence, Steam discovery, process launching, Windows power-plan restoration, recovery, and system monitoring.
 - Added manual executable entry and basic local Steam manifest scanning.
 - Added per-game power-plan profiles, persisted session snapshots, launch monitoring, and recovery on restart.
 - Added CPU and RAM sampling, local session history, logging, and Windows CI build configuration.

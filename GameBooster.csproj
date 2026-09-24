@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>GameBooster</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x64;arm64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+    <UseWinUI>true</UseWinUI>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.11" />
+  </ItemGroup>
+</Project>

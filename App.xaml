@@ -1,0 +1,14 @@
+<Application
+    x:Class="GameBooster.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Application.Resources>
+    <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+    <Style x:Key="AccentButtonStyle" TargetType="Button">
+      <Setter Property="Background" Value="#7C5CFC"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Padding" Value="16,9"/>
+      <Setter Property="CornerRadius" Value="7"/>
+    </Style>
+  </Application.Resources>
+</Application>

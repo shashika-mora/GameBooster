@@ -3,8 +3,10 @@ node_modules/
 .npm-cache/
 *.tsbuildinfo
 dist/
-src-tauri/target/
-src-tauri/gen/schemas/
+bin/
+obj/
+artifacts/
+.vs/
 .env.local
 *.log
 *.db

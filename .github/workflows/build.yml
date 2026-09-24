@@ -1,4 +1,4 @@
-name: Build
+name: Build native Windows app
 on:
   push:
   pull_request:
@@ -8,15 +8,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-dotnet@v4
         with:
-          node-version: '22'
-          cache: npm
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
-      - run: npm ci
-      - run: npm run build
-      - run: cargo test --manifest-path src-tauri/Cargo.toml
-      - run: npm run tauri build
+          dotnet-version: '8.0.x'
+      - run: dotnet restore
+      - run: dotnet build --configuration Release --no-restore --arch x64
