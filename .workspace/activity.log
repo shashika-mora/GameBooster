@@ -1,0 +1,3 @@
+2026-09-24T15:30:47+05:30 | repository | Added native WinUI 3 application and removed the browser-backed Tauri/React shell.
+2026-09-24T15:30:47+05:30 | security-review | Identified unsafe shell execution for user-selected game executables.
+2026-09-24T15:30:47+05:30 | repository | Changed game process creation to UseShellExecute=false and documented validation/build procedures.
