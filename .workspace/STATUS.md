@@ -15,6 +15,7 @@ Updated: 2026-09-24
 - `git diff --check` passes.
 - Local `dotnet build` is currently unavailable when the .NET SDK is not installed.
 - GitHub Actions uses `windows-latest` and runs the Release build.
+- The current PR is not merged because the Windows App SDK XAML compiler exits with code 1 on GitHub Actions; CI diagnostics were added to expose the compiler input, but the runner did not emit a readable XAML error.
 
 ## Recent security change
 
