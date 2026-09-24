@@ -1,4 +1,4 @@
-name: Build
+name: Build native Windows app
 on:
   push:
   pull_request:
@@ -8,15 +8,33 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-dotnet@v4
         with:
-          node-version: '22'
-          cache: npm
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+          dotnet-version: '8.0.x'
+      - run: dotnet restore
+      - run: dotnet build --configuration Release --no-restore --arch x64
+        continue-on-error: true
+        id: build
+      - name: Print WinUI compiler diagnostics
+        if: steps.build.outcome == 'failure'
+        shell: pwsh
+        run: |
+          $inputs = Get-ChildItem -Path . -Recurse -Filter input.json -ErrorAction SilentlyContinue
+          if ($inputs.Count -eq 0) {
+            Write-Error "WinUI compiler input.json was not produced."
+          }
+          foreach ($input in $inputs) {
+            Write-Host "===== XAML compiler input: $($input.FullName) ====="
+            Get-Content -Raw $input.FullName
+          }
+      - name: Upload WinUI compiler diagnostics
+        if: steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
         with:
-          workspaces: src-tauri
-      - run: npm ci
-      - run: npm run build
-      - run: cargo test --manifest-path src-tauri/Cargo.toml
-      - run: npm run tauri build
+          name: winui-compiler-diagnostics
+          path: |
+            obj/**
+            bin/**
+          if-no-files-found: error
+      - run: exit 1
+        if: steps.build.outcome == 'failure'

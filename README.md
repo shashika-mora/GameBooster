@@ -10,22 +10,22 @@ Steam discovery reads local manifests; it may not identify an executable for eve
 
 ## Architecture
 
-- React and TypeScript render the UI and call narrow Tauri commands.
-- Rust owns game discovery, process lifetime, SQLite persistence, monitoring, and all system changes.
-- The SQLite database is stored in the operating system's application data directory and migrated on startup.
+- Native WinUI 3 and C# render the interface; there is no browser, WebView2, React, Vite, Electron, or Tauri runtime.
+- The service layer owns Steam discovery, process lifetime, SQLite persistence, monitoring, and Windows power-plan changes.
+- The SQLite database is stored in `%LOCALAPPDATA%\\GameBooster` and migrated on startup.
 - Before a power-plan change, the original scheme and pending session are committed to disk. Startup exposes pending recovery instead of silently applying another profile.
 - A failed restoration remains visible for retry.
 
 ## Development
 
-Requires Node.js, npm, stable Rust with the Windows MSVC target, Microsoft C++ Build Tools, and WebView2. See the [Tauri Windows prerequisites](https://v2.tauri.app/start/prerequisites/). The development CI uses the standard MSVC toolchain.
+Requires the .NET 8 SDK and the Windows App SDK/WinUI 3 workload in Visual Studio 2022. The project targets `net8.0-windows10.0.19041.0` for x64 and arm64.
 
 ```powershell
-npm install
-npm run tauri dev
+dotnet restore
+dotnet run
 ```
 
-Checks: `npm run build`, `cargo test --manifest-path src-tauri/Cargo.toml`. Installer: `npm run tauri build` on Windows.
+Checks: `dotnet build --configuration Release`. Publish an MSIX package from Visual Studio's packaging project or with the Windows App SDK packaging tooling.
 
 ## Safety and privacy
 
