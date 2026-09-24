@@ -13,3 +13,18 @@ jobs:
           dotnet-version: '8.0.x'
       - run: dotnet restore
       - run: dotnet build --configuration Release --no-restore --arch x64
+        continue-on-error: true
+        id: build
+      - name: Print WinUI compiler diagnostics
+        if: steps.build.outcome == 'failure'
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path . -Recurse -Filter output.json -ErrorAction SilentlyContinue
+          if ($files.Count -eq 0) {
+            Write-Error "WinUI compiler output.json was not produced."
+          }
+          foreach ($file in $files) {
+            Write-Host "===== $($file.FullName) ====="
+            Get-Content -Raw $file.FullName
+          }
+          exit 1
