@@ -1,6 +1,9 @@
 namespace GameBooster;
 
-public sealed record Game(long Id, string Name, string? Executable, string? InstallPath, string Source);
+public sealed record Game(long Id, string Name, string? Executable, string? InstallPath, string Source)
+{
+    public string Initial => string.IsNullOrEmpty(Name) ? "?" : Name[..1].ToUpperInvariant();
+}
 public sealed record Profile(long GameId, string Preset, string? PowerScheme);
 public sealed record Session(long Id, long GameId, string GameName, string ProfilePreset, DateTimeOffset StartedAt, DateTimeOffset? EndedAt, string Status, string? RestorationResult);
 public sealed record Recovery(long SessionId, string GameName, string? PreviousScheme, string? AppliedScheme, string Status);
