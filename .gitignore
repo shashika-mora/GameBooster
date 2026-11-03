@@ -6,6 +6,10 @@ dist/
 bin/
 obj/
 artifacts/
+TestResults/
+.workspace.zip
+# Leftover generated files from the retired Tauri prototype.
+src-tauri/
 .vs/
 .env.local
 *.log
