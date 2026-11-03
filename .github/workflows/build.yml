@@ -1,40 +1,75 @@
 name: Build native Windows app
+
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   windows:
+    name: Windows ${{ matrix.architecture }}
     runs-on: windows-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [x64, arm64]
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
-      - run: dotnet restore
-      - run: dotnet build --configuration Release --no-restore --arch x64
-        continue-on-error: true
-        id: build
-      - name: Print WinUI compiler diagnostics
-        if: steps.build.outcome == 'failure'
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      - name: Restore application
+        run: dotnet restore GameBooster.csproj -p:Platform=${{ matrix.architecture }} --locked-mode
+      - name: Build application
+        run: dotnet build GameBooster.csproj -c Release --no-restore -p:Platform=${{ matrix.architecture }} -bl:artifacts/build-${{ matrix.architecture }}.binlog
+      - name: Restore tests
+        if: matrix.architecture == 'x64'
+        run: dotnet restore tests/GameBooster.Tests/GameBooster.Tests.csproj --locked-mode
+      - name: Test session safety and persistence
+        if: matrix.architecture == 'x64'
+        run: dotnet test tests/GameBooster.Tests/GameBooster.Tests.csproj -c Release --no-restore --logger trx --results-directory artifacts/tests
+      - name: Publish portable application
+        run: dotnet publish GameBooster.csproj -c Release -p:Platform=${{ matrix.architecture }} --self-contained true --no-restore -o artifacts/win-${{ matrix.architecture }}
+      - name: Verify published application startup
+        if: matrix.architecture == 'x64'
         shell: pwsh
-        run: |
-          $inputs = Get-ChildItem -Path . -Recurse -Filter input.json -ErrorAction SilentlyContinue
-          if ($inputs.Count -eq 0) {
-            Write-Error "WinUI compiler input.json was not produced."
-          }
-          foreach ($input in $inputs) {
-            Write-Host "===== XAML compiler input: $($input.FullName) ====="
-            Get-Content -Raw $input.FullName
-          }
-      - name: Upload WinUI compiler diagnostics
-        if: steps.build.outcome == 'failure'
-        uses: actions/upload-artifact@v4
+        run: ./scripts/SmokeTest.ps1 -AppPath artifacts/win-x64/GameBooster.exe
+      - name: Upload portable application
+        uses: actions/upload-artifact@v7
         with:
-          name: winui-compiler-diagnostics
-          path: |
-            obj/**
-            bin/**
+          name: GameBooster-win-${{ matrix.architecture }}
+          path: artifacts/win-${{ matrix.architecture }}/
           if-no-files-found: error
-      - run: exit 1
-        if: steps.build.outcome == 'failure'
+      - name: Upload test reports
+        if: always() && matrix.architecture == 'x64'
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: |
+            artifacts/tests/*.trx
+            artifacts/smoke/**/startup.json
+          if-no-files-found: ignore
+      - name: Upload build diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-diagnostics-${{ matrix.architecture }}
+          path: |
+            artifacts/*.binlog
+            obj/**/input.json
+            obj/**/output.json
+            artifacts/smoke/**/gamebooster.log
+          if-no-files-found: warn

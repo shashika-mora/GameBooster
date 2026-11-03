@@ -17,12 +17,12 @@ This directory contains repository-local operating notes for maintainers and cod
 The application is a native WinUI 3 project targeting .NET 8 and Windows 10 build 19041 or later.
 
 ```powershell
-dotnet restore
-dotnet build --configuration Release --arch x64
-dotnet run --framework net8.0-windows10.0.19041.0
+dotnet restore GameBooster.csproj --locked-mode
+dotnet build GameBooster.csproj --configuration Release --no-restore
+dotnet run --project GameBooster.csproj
 ```
 
-Visual Studio 2022 must have the Windows App SDK / WinUI 3 workload installed. The repository's GitHub Actions workflow builds on `windows-latest`.
+The .NET SDK and NuGet-provided Windows App SDK build tools support command-line builds without a Visual Studio workload. The repository's GitHub Actions workflow builds on `windows-latest`. See the root README for locked restore, tests, portable publishing, and the startup smoke test.
 
 ## Security checks
 

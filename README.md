@@ -1,34 +1,63 @@
 # GameBooster
 
-GameBooster is an offline-first Windows desktop utility for launching games with explicit, reversible session settings. It records the original system state before making a change, watches the launched game, and restores that state when the game exits. It makes no FPS promises and uploads no telemetry.
+[![Windows build](https://github.com/shashika-mora/GameBooster/actions/workflows/build.yml/badge.svg)](https://github.com/shashika-mora/GameBooster/actions/workflows/build.yml)
 
-## Current scope
-
-The first vertical slice provides a local game library, manual executable entry, basic Steam discovery, per-game power-plan selection, session launch and history, recovery of an interrupted power-plan change, and CPU/RAM monitoring. The default Balanced profile changes nothing. Performance selects the standard Windows High performance plan if installed; Custom accepts an existing scheme GUID. GameBooster never requires permanent elevation or disables security software.
-
-Steam discovery reads local manifests; it may not identify an executable for every game. Those entries can be completed manually. GPU and FPS metrics are intentionally absent until a reliable local method is available.
-
-## Architecture
-
-- Native WinUI 3 and C# render the interface; there is no browser, WebView2, React, Vite, Electron, or Tauri runtime.
-- The service layer owns Steam discovery, process lifetime, SQLite persistence, monitoring, and Windows power-plan changes.
-- The SQLite database is stored in `%LOCALAPPDATA%\\GameBooster` and migrated on startup.
-- Before a power-plan change, the original scheme and pending session are committed to disk. Startup exposes pending recovery instead of silently applying another profile.
-- A failed restoration remains visible for retry.
+GameBooster is an offline Windows desktop utility for launching games with explicit, reversible session settings. It saves the original power plan before making a change, watches the launched executable, and verifies restoration when the process exits. It makes no FPS improvement claims and uploads no telemetry.
 
 ## Development
 
-Requires the .NET 8 SDK and the Windows App SDK/WinUI 3 workload in Visual Studio 2022. The project targets `net8.0-windows10.0.19041.0` for x64 and arm64.
+Use Windows 10/11, a .NET SDK capable of building .NET 8, and network access for the initial NuGet restore. The WinUI compiler and Windows App SDK dependencies come from NuGet; Visual Studio is optional for command-line builds. The application runs offline after dependencies are installed or a portable build is extracted.
 
 ```powershell
-dotnet restore
-dotnet run
+dotnet restore GameBooster.csproj --locked-mode
+dotnet run --project GameBooster.csproj
 ```
 
-Checks: `dotnet build --configuration Release`. Publish an MSIX package from Visual Studio's packaging project or with the Windows App SDK packaging tooling.
+The default architecture is x64. Pass `-p:Platform=arm64` to build for ARM64. Run an ARM64 build on ARM64 Windows.
 
-## Safety and privacy
+```powershell
+dotnet build GameBooster.csproj -c Release --no-restore
+dotnet restore tests/GameBooster.Tests/GameBooster.Tests.csproj --locked-mode
+dotnet test tests/GameBooster.Tests/GameBooster.Tests.csproj -c Release --no-restore
+```
 
-All data stays on the local machine. The app has no network feature or analytics. Power-plan selection is optional and requires an existing plan GUID. Recovery is offered on the next launch after a crash or restart. See [PRIVACY.md](PRIVACY.md).
+## Portable builds
 
-Licensed under MIT.
+```powershell
+dotnet publish GameBooster.csproj -c Release -p:Platform=x64 --self-contained true -o artifacts/win-x64
+./scripts/SmokeTest.ps1 -AppPath artifacts/win-x64/GameBooster.exe
+```
+
+Keep the entire published folder together, including `GameBooster.pri` and the native runtime files. Launch `GameBooster.exe` from that folder. The .NET and Windows App SDK runtimes are included. This is an unpackaged folder distribution; an installer, signing, and MSIX publishing are future release work.
+
+GitHub Actions builds and publishes x64 and ARM64 artifacts. The x64 job also runs the tests and starts the published application with isolated temporary data to verify that its WinUI window loads. ARM64 is compiled on the x64 runner and needs runtime validation on ARM64 hardware. Failed builds retain diagnostics; successful builds upload the portable application folders.
+
+## Current features
+
+- Manually add a game with a native executable picker, or discover games from local Steam manifests and library locations.
+- Save a per-game profile and see its exact power-plan setting.
+- Persist a recovery snapshot and operation record before changing Windows.
+- Observe process exit, restore and verify the original plan, and save session history.
+- Recover unfinished sessions after a crash or restart. Failed recovery stays visible and can be retried.
+- Sample total system CPU usage and physical memory every three seconds.
+- View local storage information, recovery guidance, and session restoration results.
+
+| Preset | Explicit operation |
+| --- | --- |
+| Balanced | No power-plan change. |
+| Performance | Select the existing Windows High performance scheme, `8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c`. If unavailable or denied, the game is not launched. |
+| Custom | Select the existing scheme GUID entered by the user, or leave it blank for no change. |
+
+Steam discovery leaves ambiguous executable paths unset so the user can choose the correct file. Games that start a separate launcher may end their monitored session early. GPU, temperature, and FPS measurement are not implemented.
+
+## Safety and architecture
+
+The application uses native WinUI 3 with C# services and SQLite. Windows power-plan APIs, system telemetry, and process launching are separated from the interface. Direct process creation uses `UseShellExecute=false`; the application runs as the current user.
+
+SQLite commits the active snapshot before applying a profile. Database access is serialized between the UI and process observer. Closing the app cancels observation and attempts restoration before disposing storage, while leaving the game running. A later launch can recover any unfinished snapshot. A second app instance cannot start against the same data directory.
+
+If another application or the user changes the power plan during a session, GameBooster records a conflict. Select the original plan in Windows and retry recovery; GameBooster verifies it before clearing the pending session.
+
+Tests use temporary SQLite databases and fake system adapters to cover process-exit races, launch and permission failures, restoration verification, external plan changes, recovery across restarts, and shutdown. A Windows test also observes a real short-lived utility process without changing the machine's power plan. Applying and restoring a real gaming profile still requires acceptance testing on the target machine.
+
+Data is stored in `%LOCALAPPDATA%\GameBooster`. Logs rotate locally at approximately 1 MB and retain one previous file. See [PRIVACY.md](PRIVACY.md). Licensed under MIT.

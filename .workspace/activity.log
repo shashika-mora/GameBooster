@@ -2,3 +2,7 @@
 2026-09-24T15:30:47+05:30 | security-review | Identified unsafe shell execution for user-selected game executables.
 2026-09-24T15:30:47+05:30 | repository | Changed game process creation to UseShellExecute=false and documented validation/build procedures.
 2026-09-24T15:35:00+05:30 | ci | Native Windows CI failed in the Windows App SDK XAML compiler; diagnostic workflow output was added and the PR remains unmerged pending a reproducible compiler error.
+2026-11-03 | build-repair | Applied the existing valid-symbol and duplicate-entry-point fixes to main. Added text normalization without changing the content of pre-existing local files.
+2026-11-03 | reliability | Added verified power-plan restoration, serialized SQLite access, shutdown recovery, system CPU sampling, persistent operation records, and tests using isolated system adapters.
+2026-11-03 | local-run | Reproduced the missing application PRI in portable output, enabled WinUI packaging tooling, and verified published x64 startup and native navigation.
+2026-11-03 | ci | Added locked restore, x64/ARM64 publishing, session tests, x64 startup verification, and downloadable application artifacts.
