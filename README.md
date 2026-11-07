@@ -41,12 +41,17 @@ GitHub Actions builds and publishes x64 and ARM64 artifacts. The x64 job also ru
 - Recover unfinished sessions after a crash or restart. Failed recovery stays visible and can be retried.
 - Sample total system CPU usage and physical memory every three seconds.
 - View local storage information, recovery guidance, and session restoration results.
+- Switch between System, Light, and Dark appearance; the choice is saved and applied throughout the app.
+- Search the library, edit a selected game's profile, and remove games while retaining session history. Re-adding a removed executable restores its profile.
+- Choose power plans by their installed Windows names, with optional above-normal game priority and session-only idle-sleep prevention.
+- Review Game Mode, graphics/GPU selection, refresh rate, captures, startup apps, and updates from the Gaming setup page.
+- Inspect each session's applied, skipped, failed, and restored operations.
 
 | Preset | Explicit operation |
 | --- | --- |
 | Balanced | No power-plan change. |
 | Performance | Select the existing Windows High performance scheme, `8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c`. If unavailable or denied, the game is not launched. |
-| Custom | Select the existing scheme GUID entered by the user, or leave it blank for no change. |
+| Custom | Choose an installed power plan or keep the current plan, then review optional CPU priority and sleep prevention. |
 
 Steam discovery leaves ambiguous executable paths unset so the user can choose the correct file. Games that start a separate launcher may end their monitored session early. GPU, temperature, and FPS measurement are not implemented.
 
@@ -59,5 +64,11 @@ SQLite commits the active snapshot before applying a profile. Database access is
 If another application or the user changes the power plan during a session, GameBooster records a conflict. Select the original plan in Windows and retry recovery; GameBooster verifies it before clearing the pending session.
 
 Tests use temporary SQLite databases and fake system adapters to cover process-exit races, launch and permission failures, restoration verification, external plan changes, recovery across restarts, and shutdown. A Windows test also observes a real short-lived utility process without changing the machine's power plan. Applying and restoring a real gaming profile still requires acceptance testing on the target machine.
+
+CPU priority and idle-sleep prevention are off by default. Priority recovery validates both process ID and start time, including after an app crash, so a reused process ID is not modified. Per-operation records distinguish application results from restoration results. Appearance and sampling preferences are stored locally. Monitoring uses at least a five-second interval during gameplay.
+
+The design evidence and limitations are recorded in [Gaming optimization decisions](docs/gaming-optimization.md). Windows-managed setup choices are reviewed by the user in Windows and are separate from automatic session restoration.
+
+Published theme checks can be run with `./scripts/SmokeTest.ps1 -AppPath artifacts/win-x64/GameBooster.exe -Theme Light` (also `Dark` and `System`). Maintainers can launch an isolated sample library with `GameBooster.exe --preview --data-dir <temporary-directory>` for interface review.
 
 Data is stored in `%LOCALAPPDATA%\GameBooster`. Logs rotate locally at approximately 1 MB and retain one previous file. See [PRIVACY.md](PRIVACY.md). Licensed under MIT.

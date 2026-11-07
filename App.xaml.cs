@@ -22,8 +22,9 @@ public partial class App : Application
     {
         var arguments = Environment.GetCommandLineArgs();
         var smokeTest = arguments.Contains("--smoke-test");
+        var preview = arguments.Contains("--preview");
         string? Option(string key) => Array.IndexOf(arguments, key) is var index && index >= 0 && index + 1 < arguments.Length ? arguments[index + 1] : null;
-        var directory = smokeTest ? Option("--data-dir") ?? throw new ArgumentException("Smoke tests require --data-dir.") : GameService.DefaultDataDirectory;
+        var directory = smokeTest || preview ? Option("--data-dir") ?? throw new ArgumentException("Diagnostics require --data-dir.") : GameService.DefaultDataDirectory;
         _log = new AppLog(directory);
         var identity = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(Path.GetFullPath(directory).ToUpperInvariant())));
         _instance = new Mutex(true, @"Local\GameBooster-" + identity, out var created);
@@ -32,6 +33,10 @@ public partial class App : Application
         try
         {
             service = new GameService(Path.Combine(directory, "gamebooster.db"), new WindowsPowerPlans(), new WindowsGameLauncher());
+            if (smokeTest && Option("--theme") is { } theme)
+                service.SaveSettings(service.GetSettings() with { Theme = theme });
+            if (preview && service.Games().Count == 0)
+                service.AddGame("Sample game", Path.Combine(Environment.SystemDirectory, "where.exe"));
             _window = new MainWindow(service);
             _window.Closed += (_, _) => { _instance.ReleaseMutex(); _instance.Dispose(); };
             if (smokeTest)
@@ -44,7 +49,7 @@ public partial class App : Application
                     var error = _window.LastError;
                     var loaded = ((FrameworkElement)_window.Content).IsLoaded;
                     Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(report))!);
-                    File.WriteAllText(report, JsonSerializer.Serialize(new { success = loaded && error is null, windowLoaded = loaded, error, gameCount = service.Games().Count, powerScheme = service.ActivePowerScheme() }));
+                    File.WriteAllText(report, JsonSerializer.Serialize(new { success = loaded && error is null, windowLoaded = loaded, error, gameCount = service.Games().Count, powerScheme = service.ActivePowerScheme(), availablePowerPlans = service.PowerPlans().Count, appearance = _window.AppearanceDiagnostics() }));
                     if (!loaded || error is not null) Environment.ExitCode = 1;
                     _window.Close();
                 };

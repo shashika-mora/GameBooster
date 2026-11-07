@@ -43,10 +43,13 @@ jobs:
         run: dotnet test tests/GameBooster.Tests/GameBooster.Tests.csproj -c Release --no-restore --logger trx --results-directory artifacts/tests
       - name: Publish portable application
         run: dotnet publish GameBooster.csproj -c Release -p:Platform=${{ matrix.architecture }} --self-contained true --no-restore -o artifacts/win-${{ matrix.architecture }}
-      - name: Verify published application startup
+      - name: Verify startup and appearance themes
         if: matrix.architecture == 'x64'
         shell: pwsh
-        run: ./scripts/SmokeTest.ps1 -AppPath artifacts/win-x64/GameBooster.exe
+        run: |
+          foreach ($theme in @('System', 'Light', 'Dark')) {
+            ./scripts/SmokeTest.ps1 -AppPath artifacts/win-x64/GameBooster.exe -Theme $theme
+          }
       - name: Upload portable application
         uses: actions/upload-artifact@v7
         with:

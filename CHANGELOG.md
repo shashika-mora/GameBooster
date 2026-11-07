@@ -2,6 +2,15 @@
 
 ## 0.1.0 — development
 
+### 2026-11-07
+
+- Added persistent System/Light/Dark appearance across the interface and theme-aware title bars.
+- Replaced technical product copy and power-plan IDs with user-facing controls and Windows plan names.
+- Added explicit opt-in game CPU priority and idle-sleep prevention, with operation records and crash/shutdown recovery.
+- Added a researched Windows gaming setup checklist with local Settings shortcuts.
+- Added library search, profile shortcuts, removal with history retained, active-session details, and per-operation history.
+- Added database migration and priority safety tests, isolated UI preview data, and startup checks for all three appearance modes.
+
 - Fixed invalid WinUI symbols, duplicate startup code, and missing PRI resources in portable publishing.
 - Added x64 and ARM64 CI publishing, locked dependency restores, startup smoke tests, and downloadable build artifacts.
 - Fixed process-exit races, SQLite access across threads, false restoration success, shutdown restoration, preset mapping, and game selection refresh.

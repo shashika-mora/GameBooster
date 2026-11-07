@@ -6,3 +6,6 @@
 2026-11-03 | reliability | Added verified power-plan restoration, serialized SQLite access, shutdown recovery, system CPU sampling, persistent operation records, and tests using isolated system adapters.
 2026-11-03 | local-run | Reproduced the missing application PRI in portable output, enabled WinUI packaging tooling, and verified published x64 startup and native navigation.
 2026-11-03 | ci | Added locked restore, x64/ARM64 publishing, session tests, x64 startup verification, and downloadable application artifacts.
+2026-11-07 | product | Added persisted appearance themes, named power plans, library search/removal, session operation details, and user-focused copy.
+2026-11-07 | optimization | Researched Windows gaming guidance and reference utilities. Added opt-in bounded game priority and session-scoped idle-sleep prevention with durable recovery and tests.
+2026-11-07 | verification | Added three-theme startup/color checks and isolated preview data. Reviewed live theme switching, title-bar contrast, profile editing, and the gaming setup page.

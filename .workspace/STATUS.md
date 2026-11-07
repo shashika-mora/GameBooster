@@ -1,6 +1,6 @@
 # Current Status
 
-Updated: 2026-11-03
+Updated: 2026-11-07
 
 ## Baseline
 
@@ -10,6 +10,10 @@ Updated: 2026-11-03
 - UI and process-observer database access is serialized. Closing the app restores an active session before disposing storage.
 - System CPU sampling uses GetSystemTimes; RAM uses GlobalMemoryStatusEx.
 - Refresh preserves game selection and profile edits. Windows startup includes XamlControlsResources.
+- Database schema version 2 adds appearance/sampling preferences, optional priority/awake profile controls, archived games, and serialized operation snapshots. Existing profiles default to no additional changes.
+- Priority snapshots include PID and UTC start ticks. The original priority is restored only for the matching process and expected state; other session operations are still restored if one conflicts.
+- Session-owned power-request handles prevent idle sleep when explicitly enabled and release on cleanup/process termination.
+- Product UI uses theme resources for System/Light/Dark and high-contrast palettes, named power plans, and user-focused copy. Gaming setup links are a fixed allowlist; source evidence is in docs/gaming-optimization.md.
 
 ## Verification
 
@@ -25,3 +29,4 @@ Updated: 2026-11-03
 - Never suppress a failed restoration or clear pending recovery without verification.
 - Tests must use temporary databases and fake power-plan adapters for state-changing scenarios.
 - The old src-tauri directory and workspace ZIP are local ignored leftovers; do not add them to commits.
+- Use `--preview --data-dir <temporary-directory>` for isolated sample-library UI review. The normal library must not be seeded with diagnostic entries.

@@ -1,18 +1,80 @@
-<Application
-    x:Class="GameBooster.App"
+<Application x:Class="GameBooster.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    RequestedTheme="Dark">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
       </ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="BrandBrush" Color="#7351DA"/>
+          <SolidColorBrush x:Key="AccentButtonTextBrush" Color="White"/>
+          <SolidColorBrush x:Key="WindowBrush" Color="#10151D"/>
+          <SolidColorBrush x:Key="SidebarBrush" Color="#151C27"/>
+          <SolidColorBrush x:Key="SurfaceBrush" Color="#1B2432"/>
+          <SolidColorBrush x:Key="HeroBrush" Color="#222C3E"/>
+          <SolidColorBrush x:Key="PrimaryTextBrush" Color="#F0F3FA"/>
+          <SolidColorBrush x:Key="SecondaryTextBrush" Color="#ACB8CA"/>
+          <SolidColorBrush x:Key="AccentTextBrush" Color="#BAACFF"/>
+          <SolidColorBrush x:Key="DividerBrush" Color="#344052"/>
+          <SolidColorBrush x:Key="SuccessBrush" Color="#85DFBC"/>
+          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#392D1E"/>
+          <SolidColorBrush x:Key="WarningTextBrush" Color="#F3CD8D"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="BrandBrush" Color="#7351DA"/>
+          <SolidColorBrush x:Key="AccentButtonTextBrush" Color="White"/>
+          <SolidColorBrush x:Key="WindowBrush" Color="#F2F4F9"/>
+          <SolidColorBrush x:Key="SidebarBrush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="HeroBrush" Color="#E9E5FA"/>
+          <SolidColorBrush x:Key="PrimaryTextBrush" Color="#1A2233"/>
+          <SolidColorBrush x:Key="SecondaryTextBrush" Color="#566279"/>
+          <SolidColorBrush x:Key="AccentTextBrush" Color="#5D3FBD"/>
+          <SolidColorBrush x:Key="DividerBrush" Color="#D7DDE8"/>
+          <SolidColorBrush x:Key="SuccessBrush" Color="#146449"/>
+          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FFF0D5"/>
+          <SolidColorBrush x:Key="WarningTextBrush" Color="#754608"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="HighContrast">
+          <SolidColorBrush x:Key="BrandBrush" Color="{ThemeResource SystemColorHighlightColor}"/>
+          <SolidColorBrush x:Key="AccentButtonTextBrush" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+          <SolidColorBrush x:Key="WindowBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+          <SolidColorBrush x:Key="SidebarBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+          <SolidColorBrush x:Key="SurfaceBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+          <SolidColorBrush x:Key="HeroBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+          <SolidColorBrush x:Key="PrimaryTextBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+          <SolidColorBrush x:Key="SecondaryTextBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+          <SolidColorBrush x:Key="AccentTextBrush" Color="{ThemeResource SystemColorHotlightColor}"/>
+          <SolidColorBrush x:Key="DividerBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+          <SolidColorBrush x:Key="SuccessBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+          <SolidColorBrush x:Key="WarningSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+          <SolidColorBrush x:Key="WarningTextBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
       <Style x:Key="AccentButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="#7C5CFC"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="Padding" Value="16,9"/>
-        <Setter Property="CornerRadius" Value="7"/>
+        <Setter Property="Background" Value="{ThemeResource BrandBrush}"/>
+        <Setter Property="Foreground" Value="{ThemeResource AccentButtonTextBrush}"/>
+        <Setter Property="Padding" Value="18,10"/>
+        <Setter Property="CornerRadius" Value="8"/>
+      </Style>
+      <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{ThemeResource DividerBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="Padding" Value="22"/>
+      </Style>
+      <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{ThemeResource PrimaryTextBrush}"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+      </Style>
+      <Style x:Key="BodyStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{ThemeResource SecondaryTextBrush}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="LineHeight" Value="22"/>
       </Style>
     </ResourceDictionary>
   </Application.Resources>
