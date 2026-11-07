@@ -8,15 +8,19 @@ public static class ProfileRules
     {
         if (profile.Preset is not ("Balanced" or "Performance" or "Custom"))
             throw new InvalidOperationException("Invalid profile preset.");
+        if (profile.PriorityPreference is not ("Unchanged" or "AboveNormal"))
+            throw new InvalidOperationException("Choose the default or above-normal game priority.");
         Guid? scheme = null;
         if (!string.IsNullOrWhiteSpace(profile.PowerScheme))
         {
             if (!Guid.TryParseExact(profile.PowerScheme.Trim(), "D", out var parsed))
-                throw new InvalidOperationException("Enter a power scheme GUID in the form xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.");
+                throw new InvalidOperationException("Choose a valid power plan.");
             scheme = parsed;
         }
         if (profile.Preset == "Balanced" && scheme is not null)
             throw new InvalidOperationException("Balanced does not change the power plan.");
+        if (profile.Preset == "Balanced" && (profile.PriorityPreference != "Unchanged" || profile.KeepAwake))
+            throw new InvalidOperationException("Choose Custom to add session settings to the Balanced preset.");
         if (profile.Preset == "Performance")
         {
             if (scheme is not null && scheme != HighPerformance)

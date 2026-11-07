@@ -308,6 +308,7 @@ public sealed class SessionTests : IDisposable
 
     private sealed class FakeProcess : IGameProcess
     {
+        public ProcessIdentity Identity => new(1234, 1000);
         private readonly TaskCompletionSource _exit = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public Task WaitForExitAsync(CancellationToken cancellationToken) => _exit.Task.WaitAsync(cancellationToken);
         public void Exit() => _exit.TrySetResult();

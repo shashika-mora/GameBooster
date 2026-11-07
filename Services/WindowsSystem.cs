@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace GameBooster.Services;
 
@@ -8,10 +9,12 @@ public interface IPowerPlans
 {
     Guid ActiveScheme();
     void SetScheme(Guid scheme);
+    IReadOnlyList<PowerPlanOption> AvailableSchemes() => [];
 }
 
 public interface IGameProcess : IDisposable
 {
+    ProcessIdentity Identity { get; }
     Task WaitForExitAsync(CancellationToken cancellationToken);
 }
 
@@ -22,6 +25,28 @@ public interface IGameLauncher
 
 public sealed class WindowsPowerPlans : IPowerPlans
 {
+    public IReadOnlyList<PowerPlanOption> AvailableSchemes()
+    {
+        var result = new List<PowerPlanOption>();
+        for (uint index = 0; index < 256; index++)
+        {
+            uint size = 16;
+            var buffer = new byte[size];
+            var error = PowerEnumerate(0, 0, 0, 16, index, buffer, ref size);
+            if (error == 259) break;
+            if (error != 0) throw new Win32Exception((int)error, "Cannot list power plans.");
+            var scheme = new Guid(buffer);
+            uint nameSize = 0;
+            error = PowerReadFriendlyName(0, ref scheme, 0, 0, null, ref nameSize);
+            if ((error != 0 && error != 234) || nameSize == 0 || nameSize > 65536)
+                throw new Win32Exception((int)error, "Cannot read a power plan name.");
+            var name = new byte[nameSize];
+            error = PowerReadFriendlyName(0, ref scheme, 0, 0, name, ref nameSize);
+            if (error != 0) throw new Win32Exception((int)error, "Cannot read a power plan name.");
+            result.Add(new(scheme.ToString("D"), Encoding.Unicode.GetString(name).TrimEnd('\0')));
+        }
+        return result;
+    }
     public Guid ActiveScheme()
     {
         var error = PowerGetActiveScheme(0, out var pointer);
@@ -39,6 +64,8 @@ public sealed class WindowsPowerPlans : IPowerPlans
     [DllImport("powrprof.dll")] private static extern uint PowerGetActiveScheme(nint root, out nint scheme);
     [DllImport("powrprof.dll")] private static extern uint PowerSetActiveScheme(nint root, ref Guid scheme);
     [DllImport("kernel32.dll")] private static extern nint LocalFree(nint memory);
+    [DllImport("powrprof.dll")] private static extern uint PowerEnumerate(nint root, nint scheme, nint subgroup, uint access, uint index, [Out] byte[] buffer, ref uint size);
+    [DllImport("powrprof.dll")] private static extern uint PowerReadFriendlyName(nint root, ref Guid scheme, nint subgroup, nint setting, [Out] byte[]? buffer, ref uint size);
 }
 
 public sealed class WindowsGameLauncher : IGameLauncher
@@ -56,6 +83,7 @@ public sealed class WindowsGameLauncher : IGameLauncher
 
     private sealed class GameProcess(Process process) : IGameProcess
     {
+        public ProcessIdentity Identity => new(process.Id, process.StartTime.ToUniversalTime().Ticks);
         public Task WaitForExitAsync(CancellationToken cancellationToken) => process.WaitForExitAsync(cancellationToken);
         public void Dispose() => process.Dispose();
     }
